@@ -1,6 +1,8 @@
 package permos
 
-import "os"
+import (
+	"io/fs"
+)
 
 type Perm struct {
 	UserRead   bool
@@ -9,15 +11,18 @@ type Perm struct {
 	GroupRead  bool
 	GroupWrite bool
 	GroupExec  bool
+	OtherRead  bool
+	OtherWrite bool
+	OtherExec  bool
 	AllRead    bool
 	AllWrite   bool
 	AllExec    bool
 }
 
 const (
-	AllExec os.FileMode = 1 << iota
-	AllWrite
-	AllRead
+	OtherExec fs.FileMode = 1 << iota
+	OtherWrite
+	OtherRead
 	GroupExec
 	GroupWrite
 	GroupRead
@@ -26,7 +31,13 @@ const (
 	UserRead
 )
 
-func (p *Perm) FileMode() (ret os.FileMode) {
+const (
+	AllRead  fs.FileMode = UserRead | GroupRead | OtherRead
+	AllWrite             = UserWrite | GroupWrite | OtherWrite
+	AllExec              = UserExec | GroupExec | OtherExec
+)
+
+func (p *Perm) FileMode() (ret fs.FileMode) {
 	if p.UserRead {
 		ret |= UserRead
 	}
@@ -44,6 +55,15 @@ func (p *Perm) FileMode() (ret os.FileMode) {
 	}
 	if p.GroupExec {
 		ret |= GroupExec
+	}
+	if p.OtherRead {
+		ret |= OtherRead
+	}
+	if p.OtherWrite {
+		ret |= OtherWrite
+	}
+	if p.OtherExec {
+		ret |= OtherExec
 	}
 	if p.AllRead {
 		ret |= AllRead

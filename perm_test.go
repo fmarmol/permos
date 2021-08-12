@@ -52,10 +52,34 @@ func Test1(t *testing.T) {
 				UserWrite:  true,
 				GroupRead:  true,
 				GroupWrite: true,
-				AllRead:    true,
-				AllWrite:   true,
+				OtherRead:  true,
+				OtherWrite: true,
 			},
 			expected: os.FileMode(0666),
+		},
+		{
+			name: "444",
+			p: Perm{
+				AllRead: true,
+			},
+			expected: os.FileMode(0444),
+		},
+		{
+			name: "666",
+			p: Perm{
+				AllRead:  true,
+				AllWrite: true,
+			},
+			expected: os.FileMode(0666),
+		},
+		{
+			name: "777",
+			p: Perm{
+				AllRead:  true,
+				AllWrite: true,
+				AllExec:  true,
+			},
+			expected: os.FileMode(0777),
 		},
 	}
 
