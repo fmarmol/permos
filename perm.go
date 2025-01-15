@@ -4,23 +4,10 @@ import (
 	"io/fs"
 )
 
-type Perm struct {
-	UserRead   bool
-	UserWrite  bool
-	UserExec   bool
-	GroupRead  bool
-	GroupWrite bool
-	GroupExec  bool
-	OtherRead  bool
-	OtherWrite bool
-	OtherExec  bool
-	AllRead    bool
-	AllWrite   bool
-	AllExec    bool
-}
+type Perm uint32
 
 const (
-	OtherExec fs.FileMode = 1 << iota
+	OtherExec Perm = 1 << iota
 	OtherWrite
 	OtherRead
 	GroupExec
@@ -29,50 +16,16 @@ const (
 	UserExec
 	UserWrite
 	UserRead
+	AllRead  = UserRead | GroupRead | OtherRead
+	AllWrite = UserWrite | GroupWrite | OtherWrite
+	AllExec  = UserExec | GroupExec | OtherExec
 )
 
-const (
-	AllRead  fs.FileMode = UserRead | GroupRead | OtherRead
-	AllWrite             = UserWrite | GroupWrite | OtherWrite
-	AllExec              = UserExec | GroupExec | OtherExec
-)
+func FileMode(perms ...Perm) fs.FileMode {
+	var ret Perm
+	for _, perm := range perms {
+		ret |= perm
+	}
+	return fs.FileMode(ret)
 
-func (p *Perm) FileMode() (ret fs.FileMode) {
-	if p.UserRead {
-		ret |= UserRead
-	}
-	if p.UserWrite {
-		ret |= UserWrite
-	}
-	if p.UserExec {
-		ret |= UserExec
-	}
-	if p.GroupRead {
-		ret |= GroupRead
-	}
-	if p.GroupWrite {
-		ret |= GroupWrite
-	}
-	if p.GroupExec {
-		ret |= GroupExec
-	}
-	if p.OtherRead {
-		ret |= OtherRead
-	}
-	if p.OtherWrite {
-		ret |= OtherWrite
-	}
-	if p.OtherExec {
-		ret |= OtherExec
-	}
-	if p.AllRead {
-		ret |= AllRead
-	}
-	if p.AllWrite {
-		ret |= AllWrite
-	}
-	if p.AllExec {
-		ret |= AllExec
-	}
-	return
 }
